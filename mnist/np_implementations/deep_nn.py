@@ -1,4 +1,5 @@
 import numpy as np
+import loss
 
 
 class LinearLayer():
@@ -32,6 +33,7 @@ class LinearLayer():
     def update(self):
         self.weights = self.weights - self.lr * self.grads['W']
         self.bias = self.bias - self.lr * self.grads['b']
+
 
     def forward(self, prev_A):
         # input: (input_dims, batch_size)
@@ -71,37 +73,53 @@ class LinearLayer():
         # grad_prev_A, shape: (input_dims, batch_size)
         grad_prev_A = np.dot(self.weights.T, grad_Z)
 
-        self.grads = {'W': grad_W, 'b': grad_b, 'prev_A': grad_prev_A}
+        self.grads = {'W': grad_W, 'b': grad_b, 'prev_A': grad_prev_A,'Z': grad_Z}
+
+
+class NN():
+    def __init__(self) -> None:
+        pass
+
+    def train(self):
+        pass
+
+    def forward():
+        pass
+
+    def backward():
+        pass
 
 
 
-class DNN():
-    def __init__(self, input_dims=None):
-        linear1 = LinearLayer(4, input_dims,activation='sigmoid')
-        # linear2 = LinearLayer(2,activation='sigmoid')
-        linear3 = LinearLayer(1,activation='sigmoid')
-        self.layers = [linear1,linear3]
 
-    def loss(self, y_pred, y_true):
-        return np.mean((y_pred - y_true)**2)
-    
+class BaseNN():
+    def __init__(self, X: np.ndarray ,y : np.ndarray, max_iter = 1000, tol=0.01, input_dims=None):
+
+        self.max_iter = max_iter
+        self.tol = tol
+
+        self.fit(X.T,y)
+
+        self._layers = []
+
+        
+
 
     def fit(self,X,y):
         
         X = X.T
 
         m = X.shape[1]
+
+        _iter = 0
         
-        for i in range(1000):
-            A = X
-            for layer in self.layers:
-                layer.forward(A)
-                A = layer.A
+        while True: 
+
+            #declare A[0]
+
+            self.forward()
 
             grad_A = -(y/A) + (1-y)/(1-A)
-            #grad_A = (A - y)/m
-
-            # print('loss: ', self.loss(A,y))
             
             #plot the cost function
             for layer in reversed(self.layers):
@@ -109,8 +127,67 @@ class DNN():
                 layer.update()
                 grad_A = layer.grads['prev_A']
 
+            if _iter == self.max_iter or loss.MSE(A,y) < self.tol:
+                break
 
-        print('loss: ', self.loss(A,y))
+        return repr()
+
+
+    def predict(self,X):
+        A = X.T
+        for layer in self.layers:
+            layer.forward(A)
+            A = layer.A
+
+        pred = np.where(A>0.5,1,0)
+
+        return pred.ravel()
+
+
+
+class DNN_backup():
+    def __init__(self, X,y, max_iter = 1000, tol=0.01, input_dims=None):
+        linear1 = LinearLayer(4, input_dims,activation='sigmoid')
+        # linear2 = LinearLayer(2,activation='sigmoid')
+        linear3 = LinearLayer(1,activation='sigmoid')
+        self.layers = [linear1,linear3]
+        self.max_iter = max_iter
+        self.tol = tol
+
+        self.fit(X,y)
+
+
+    def fit(self,X,y):
+        
+        X = X.T
+
+        m = X.shape[1]
+
+        _iter = 0
+        
+        while True: 
+
+            #declare A[0]
+            A = X
+            for layer in self.layers:
+                #forward pass
+                layer.forward(A)
+
+                # update A for the next layer
+                A = layer.A
+
+            grad_A = -(y/A) + (1-y)/(1-A)
+            
+            #plot the cost function
+            for layer in reversed(self.layers):
+                layer.backward(grad_A)
+                layer.update()
+                grad_A = layer.grads['prev_A']
+
+            if _iter == self.max_iter or loss.MSE(A,y) < self.tol:
+                break
+
+        return repr()
 
 
     def predict(self,X):
