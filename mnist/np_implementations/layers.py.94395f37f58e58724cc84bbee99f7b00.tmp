@@ -75,7 +75,7 @@ class BaseActivation():
         self.A = None
         self.Z = None
     
-c
+
 class Sigmoid(BaseActivation):
     
     #cache/return A
