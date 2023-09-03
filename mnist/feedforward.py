@@ -4,7 +4,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import confusion_matrix
 
 from np_implementations.nn import BaseNN
-from np_implementations.layers import Linear, Sigmoid
+from np_implementations.layers import Linear, Sigmoid,ReLu
 
 class TestNN(BaseNN):
     def __init__(self,lr):
@@ -13,7 +13,7 @@ class TestNN(BaseNN):
         self.lr = lr
         
         self.fc1 = Linear(4,784,lr=0.05)
-        self.rel1 = TanH()
+        self.rel1 = ReLu()
         self.fc2 = Linear(1,4,lr=0.05)
         self.sig2 = Sigmoid()
         

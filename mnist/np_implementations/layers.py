@@ -70,13 +70,13 @@ class Linear(BaseNN):
 
 
 
-class BaseActivation():
+class BaseAct():
     def __init__(self):
         self.A = None
         self.Z = None
     
-c
-class Sigmoid(BaseActivation):
+
+class Sigmoid(BaseAct):
     
     #cache/return A
     def forward(self, Z):
@@ -94,7 +94,7 @@ class Sigmoid(BaseActivation):
         
         return grad_Z
     
-class ReLu(BaseActivation):
+class ReLu(BaseAct):
     
     def forward(self, Z):
         
@@ -111,7 +111,7 @@ class ReLu(BaseActivation):
         
         return grad_Z
     
-class TanH(BaseActivation):
+class TanH(BaseAct):
     
     def forward(self, Z):
         
@@ -128,7 +128,7 @@ class TanH(BaseActivation):
         
         return grad_Z
     
-class Softmax(BaseActivation):
+class Softmax(BaseAct):
     
     def forward(self, Z):
         
