@@ -4,7 +4,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import confusion_matrix
 
 from np_implementations.nn import BaseNN
-from np_implementations.layers import Linear, Sigmoid,TanH,ReLu
+from np_implementations.layers import Linear, Sigmoid,TanH,ReLu,InvertedDropout
 
 class TestNN(BaseNN):
     def __init__(self,lr):
@@ -16,6 +16,7 @@ class TestNN(BaseNN):
         self.rel1 = ReLu()
         self.fc2 = Linear(4,8,lr=0.05,norm="l2")
         self.rel2 = ReLu()
+        self.d2 = InvertedDropout()
         self.fc3 = Linear(1,4,lr=0.05)
         self.sig3 = Sigmoid()
         
@@ -26,6 +27,7 @@ class TestNN(BaseNN):
         X = self.rel1.forward(X)
         X = self.fc2.forward(X)
         X = self.rel2.forward(X)
+        X = self.d2.forward(X)
         X = self.fc3.forward(X)
         X = self.sig3.forward(X)
         
@@ -35,6 +37,7 @@ class TestNN(BaseNN):
     def backward(self, grad):
         grad = self.sig3.backward(grad)
         grad = self.fc3.backward(grad)
+        grad = self.d2.backward(grad)
         grad = self.rel2.backward(grad)
         grad = self.fc2.backward(grad)
         grad = self.rel1.backward(grad)
@@ -68,5 +71,3 @@ model.fit(X_train,y_train)
 
 y_pred = model.predict(X_test/255)
 print(confusion_matrix(y_test, y_pred, labels=[0, 1]))
-
-print('test_git')

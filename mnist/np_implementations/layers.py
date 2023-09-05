@@ -159,7 +159,7 @@ class Softmax(BaseAct):
     
     
 class InvertedDropout():
-    def __init__(self,keep_prob):
+    def __init__(self,keep_prob=0.8):
         self.keep_prob = keep_prob
         self.rand_init = None
         
@@ -172,5 +172,7 @@ class InvertedDropout():
     
     def backward(self,grad_A):
     
-        A = np.multiply(A,drop)
-        A /= self.keep_prob
+        grad_A = np.multiply(grad_A,self.rand_init)
+        
+        return grad_A
+
