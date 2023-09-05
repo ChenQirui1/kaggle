@@ -68,3 +68,5 @@ model.fit(X_train,y_train)
 
 y_pred = model.predict(X_test/255)
 print(confusion_matrix(y_test, y_pred, labels=[0, 1]))
+
+print('test_git')
