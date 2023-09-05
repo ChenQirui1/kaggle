@@ -2,7 +2,7 @@ import numpy as np
 from np_implementations.nn import BaseNN
 
 class Linear(BaseNN):
-    def __init__(self,node_size,input_dims=None,lr=None):
+    def __init__(self,node_size,input_dims=None,lr=None,norm='l2',lambd=0.02):
         super().__init__()
         
         self.node_size = node_size
@@ -11,6 +11,9 @@ class Linear(BaseNN):
         self.bias = None
         self.Z = None
         self.prev_A = None
+        
+        self.lambd = lambd
+        self.norm = norm
         
         if lr != None:
             self.lr = lr
@@ -27,9 +30,17 @@ class Linear(BaseNN):
 
         
     def update(self):
-        self.weights = self.weights - self.lr * self.grads['W']
+        if self.norm == "l2":
+            reg = self.lambd/self.grads['W'].shape[1] * np.linalg.norm(self.weights)
+            self.weights = self.weights - self.lr * self.grads['W'] + reg
+        elif self.norm == "l1":
+            reg = self.lambd/self.grads['W'].shape[1] * np.linalg.norm(self.weights, ord=1)
+            self.weights = self.weights - self.lr * self.grads['W'] + reg
+            
+        else:
+            self.weights = self.weights - self.lr * self.grads['W']
+    
         self.bias = self.bias - self.lr * self.grads['b']
-
 
     def forward(self, prev_A):
         # input: (input_dims, batch_size)
@@ -145,3 +156,21 @@ class Softmax(BaseAct):
         
         return grad_Z
     
+    
+    
+class InvertedDropout():
+    def __init__(self,keep_prob):
+        self.keep_prob = keep_prob
+        self.rand_init = None
+        
+    def forward(self,A):
+        self.rand_init = np.random.rand(A.shape[0],A.shape[1]) < self.keep_prob
+        A = np.multiply(A,self.rand_init)
+        A /= self.keep_prob
+        
+        return A
+    
+    def backward(self,grad_A):
+    
+        A = np.multiply(A,drop)
+        A /= self.keep_prob
