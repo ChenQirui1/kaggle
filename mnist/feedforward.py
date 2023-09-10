@@ -3,8 +3,10 @@ import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import confusion_matrix
 
+
 from np_implementations.nn import BaseNN
 from np_implementations.layers import Linear, Sigmoid,TanH,ReLu,InvertedDropout
+from np_implementations.preprocessing import InputNormalise
 
 class TestNN(BaseNN):
     def __init__(self,lr):
@@ -60,14 +62,17 @@ print('Shape of X: ', X.shape)
 print('Shape of y: ', y.shape)
 
 #normalise the data to 255
-X_train = X_train / 255
+# X_train = X_train / 255
 # X = (X - X.min(axis=0)) / (X.max(axis=0) - X.min(axis=0))
 
-#initialise model
-model = TestNN(lr=0.04)
-# print(model.__repr__)
-model.fit(X_train,y_train)
+X_train,mean,std = InputNormalise(X_train)
+
+print(X_train)
+# #initialise model
+# model = TestNN(lr=0.04)
+# # print(model.__repr__)
+# model.fit(X_train,y_train)
 
 
-y_pred = model.predict(X_test/255)
-print(confusion_matrix(y_test, y_pred, labels=[0, 1]))
+# y_pred = model.predict(X_test/255)
+# print(confusion_matrix(y_test, y_pred, labels=[0, 1]))
