@@ -9,8 +9,6 @@ def InputNormalise(X: np.ndarray,dist=None):
     #if the distributin is not provided,
     #calculate mean and std from sample
 
-
-
     if dist == None:
 
         n = X.shape[0]
