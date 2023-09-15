@@ -2,7 +2,7 @@ import numpy as np
 from np_implementations.nn import BaseNN
 
 class Linear(BaseNN):
-    def __init__(self,node_size,input_dims=None,lr=None,norm='l2',lambd=0.02):
+    def __init__(self,node_size,input_dims=None,lr=None,norm='l2',lambd=0.02,weight_init="he"):
         super().__init__()
         
         self.node_size = node_size
@@ -15,31 +15,42 @@ class Linear(BaseNN):
         self.lambd = lambd
         self.norm = norm
         
+        self.weight_init = weight_init
+        
         if lr != None:
             self.lr = lr
             
+        #input dims: n[l-1]
         if input_dims:
             self.generate_weights(input_dims)
 
         self.grads = {}
                     
         
+    #
     def generate_weights(self, input_dims):
-        self.weights = np.random.randn(self.node_size, input_dims) * 0.01
+        if self.weight_init == "he":
+            scaler = np.sqrt(2/input_dims)
+        elif self.weight_init == "xavier":
+            scaler = np.sqrt(1/input_dims)
+        
+        self.weights = np.random.randn(self.node_size, input_dims) * scaler
+        
         self.bias = np.zeros((self.node_size,1))
 
         
     def update(self):
         if self.norm == "l2":
             reg = self.lambd/self.grads['W'].shape[1] * np.linalg.norm(self.weights)
-            self.weights = self.weights - self.lr * self.grads['W'] + reg
+        
         elif self.norm == "l1":
             reg = self.lambd/self.grads['W'].shape[1] * np.linalg.norm(self.weights, ord=1)
-            self.weights = self.weights - self.lr * self.grads['W'] + reg
             
         else:
             self.weights = self.weights - self.lr * self.grads['W']
-    
+
+        self.weights = self.weights - self.lr * self.grads['W'] + reg
+        
         self.bias = self.bias - self.lr * self.grads['b']
 
     def forward(self, prev_A):
@@ -76,9 +87,6 @@ class Linear(BaseNN):
         self.update()
         
         return grad_prev_A
-
-# TODO: nest other activations 
-
 
 
 class BaseAct():
@@ -175,4 +183,5 @@ class InvertedDropout():
         grad_A = np.multiply(grad_A,self.rand_init)
         
         return grad_A
+
 
