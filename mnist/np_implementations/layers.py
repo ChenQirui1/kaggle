@@ -1,6 +1,7 @@
 import numpy as np
 from np_implementations.nn import BaseNN
 
+
 class Linear(BaseNN):
     def __init__(self,node_size,input_dims=None,lr=None,norm='l2',lambd=0.02,weight_init="he"):
         super().__init__()
@@ -16,6 +17,12 @@ class Linear(BaseNN):
         self.norm = norm
         
         self.weight_init = weight_init
+        
+        
+        self.V_w = 0
+        self.V_b = 0
+        self.S_w = 0
+        self.S_b = 0
         
         if lr != None:
             self.lr = lr
@@ -47,11 +54,50 @@ class Linear(BaseNN):
             reg = self.lambd/self.grads['W'].shape[1] * np.linalg.norm(self.weights, ord=1)
             
         else:
-            self.weights = self.weights - self.lr * self.grads['W']
-
-        self.weights = self.weights - self.lr * self.grads['W'] + reg
+            reg = 0
+            
+            
+        if self.optimiser == "GDMomentum":
+            self.V_w = self.beta*self.V_w + (1-self.beta)*self.grads['W']
+            self.V_b = self.beta*self.V_b + (1-self.beta)*self.grads['b']
+            
+            self.weights = self.weights - self.lr * self.V_w + reg
         
-        self.bias = self.bias - self.lr * self.grads['b']
+            self.bias = self.bias - self.lr * self.V_w
+            
+            
+        elif self.optimiser == "RMSprop":
+            self.S_w = self.beta*self.V_w + (1-self.beta)*self.grads['W']**2
+            self.S_b = self.beta*self.V_b + (1-self.beta)*self.grads['b']**2
+            
+            
+            self.weights = self.weights - self.lr * self.grads['W']/np.sqrt(self.S_w+self.eps) + reg
+            self.bias = self.bias - self.lr * self.grads['b']/np.sqrt(self.S_b+self.eps)
+            
+        elif self.optimiser == "adam":
+            self.V_w = self.beta_v*self.V_w + (1-self.beta_v)*self.grads['W']
+            self.V_b = self.beta_v*self.V_b + (1-self.beta_v)*self.grads['b']
+            
+            self.S_w = self.beta_s*self.S_w + (1-self.beta_s)*self.grads['W']**2
+            self.S_b = self.beta_s*self.S_b + (1-self.beta_s)*self.grads['b']**2
+            
+            V_w_corr = self.V_w/(1-self.beta_v)
+            V_b_corr = self.V_b/(1-self.beta_v)
+            
+            S_w_corr = self.S_w/(1-self.beta_s)
+            S_b_corr = self.S_b/(1-self.beta_s)
+            
+            self.weights = self.weights - self.lr * V_w_corr/np.sqrt(S_w_corr+self.eps) + reg
+            self.bias = self.bias - self.lr * V_b_corr/np.sqrt(S_b_corr+self.eps)
+            
+            
+
+        # self.weights = self.weights - self.lr * self.grads['W'] + reg
+        
+        # self.bias = self.bias - self.lr * self.grads['b']
+        
+        # #maintain numerical stablity
+        # self.weights += 0.0001
 
     def forward(self, prev_A):
         # input: (input_dims, batch_size)

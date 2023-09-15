@@ -16,12 +16,12 @@ class TestNN(BaseNN):
         
         self.lr = lr
         
-        self.fc1 = Linear(8,784,lr=0.05,norm="l2")
+        self.fc1 = Linear(8,784,lr=0.2)
         self.rel1 = ReLu()
-        self.fc2 = Linear(4,8,lr=0.05,norm="l2")
+        self.fc2 = Linear(4,8,lr=0.2)
         self.rel2 = ReLu()
         # self.d2 = InvertedDropout()
-        self.fc3 = Linear(1,4,lr=0.05,weight_init="xavier")
+        self.fc3 = Linear(1,4,lr=0.2,weight_init="xavier")
         self.sig3 = Sigmoid()
     
     def forward(self,X):
@@ -63,8 +63,8 @@ print('Shape of y: ', y.shape)
 
 #normalise the data to 255
 X_train = X_train / 255
-# X = (X - X.min(axis=0)) / (X.max(axis=0) - X.min(axis=0))
 
+# X = (X - X.min(axis=0)) / (X.max(axis=0) - X.min(axis=0))
 # X_train,mean,std = InputNormalise(X_train)
 
 print(X_train)
@@ -75,6 +75,5 @@ model.fit(X_train,y_train)
 # print(vars(model))
 
 
-
-# y_pred = model.predict(X_test/255)
-# print(confusion_matrix(y_test, y_pred, labels=[0, 1]))
+y_pred = model.predict(X_test/255)
+print(confusion_matrix(y_test, y_pred, labels=[0, 1]))
