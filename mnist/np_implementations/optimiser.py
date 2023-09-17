@@ -14,6 +14,8 @@ class Optimiser():
         
         self.epochs = len(y) // self.batch_size
 
+        self.tracker = 0
+
     def run(self):
         return self.minibgd(self.X,self.y)
     
@@ -24,7 +26,9 @@ class Optimiser():
         for epoch in range(epochs):
             # A: (node_size,batch_size)
             A = self.model.forward(X[epoch])
-            
+
+            self.tracker += 1
+
             grad_A = -(y[epoch]/A) + (1-y[epoch])/(1-A)
             
             self.model.backward(grad_A)

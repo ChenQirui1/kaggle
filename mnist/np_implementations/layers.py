@@ -3,11 +3,10 @@ from np_implementations.nn import BaseNN
 
 
 class Linear(BaseNN):
-    def __init__(self,node_size,input_dims=None,lr=None,norm='l2',lambd=0.02,weight_init="he"):
+    def __init__(self,node_size,input_dims=None,lr=None,init_lr = 0.2,norm='l2',lambd=0.02,lr_decay_rate = 0.02,lr_decay=False,weight_init="he"):
         super().__init__()
         
         self.node_size = node_size
-        
         self.weights = None
         self.bias = None
         self.Z = None
@@ -18,14 +17,19 @@ class Linear(BaseNN):
         
         self.weight_init = weight_init
         
-        
+        self.epoch_num = 0
         self.V_w = 0
         self.V_b = 0
         self.S_w = 0
         self.S_b = 0
+
+        self.init_lr = init_lr
+        self.lr_decay = lr_decay
+        self.lr_decay_rate = lr_decay_rate
         
         if lr != None:
             self.lr = lr
+            self.init_lr = lr
             
         #input dims: n[l-1]
         if input_dims:
@@ -89,6 +93,13 @@ class Linear(BaseNN):
             
             self.weights = self.weights - self.lr * V_w_corr/np.sqrt(S_w_corr+self.eps) + reg
             self.bias = self.bias - self.lr * V_b_corr/np.sqrt(S_b_corr+self.eps)
+
+        
+        #learning rate decay
+        if self.lr_decay:
+            self.lr = 1/(1+self.lr_decay_rate*self.epoch_num)*self.init_lr
+        else:
+            pass
             
             
 
@@ -130,6 +141,8 @@ class Linear(BaseNN):
 
         self.grads = {'W': grad_W, 'b': grad_b, 'prev_A': grad_prev_A,'Z': grad_Z}
         
+        self.epoch_num += 1
+
         self.update()
         
         return grad_prev_A

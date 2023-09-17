@@ -38,12 +38,16 @@ class BaseNN():
             
             optimiser.run()
             
+            
+
             cost = mean_squared_error(y,self.forward(X).ravel())
             if cost < self.tol:
                 print(cost)
                 break
         
             _iter += 1
+
+        print(optimiser.tracker)
             
         print(self)
         

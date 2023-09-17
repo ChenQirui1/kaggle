@@ -16,7 +16,7 @@ class TestNN(BaseNN):
         
         self.lr = lr
         
-        self.fc1 = Linear(8,784,lr=0.2)
+        self.fc1 = Linear(8,784,lr=0.2,lr_decay=True)
         self.rel1 = ReLu()
         self.fc2 = Linear(4,8,lr=0.2)
         self.rel2 = ReLu()
@@ -73,7 +73,6 @@ model = TestNN(lr=0.04)
 # print(model.__repr__)
 model.fit(X_train,y_train)
 # print(vars(model))
-
 
 y_pred = model.predict(X_test/255)
 print(confusion_matrix(y_test, y_pred, labels=[0, 1]))
